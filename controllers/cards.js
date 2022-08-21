@@ -9,8 +9,8 @@ const getCards = (req, res) => {
 const createCard = (req, res) => {
   const { name, link } = req.body;
   const owner = req.user._id;
-  return Cards.create({ name, link, owner })
-    .then((card) => res.status(200).send(card))
+  Cards.create({ name, link, owner })
+    .then((card) => res.status(201).send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: 'Переданы некорректные данные при создании карточки.' });
@@ -26,6 +26,11 @@ const likeCard = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
+    .orFail(() => {
+      const err = new Error();
+      err.message = 'NotFound';
+      throw err;
+    })
     .then((card) => res.status(200).send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -44,6 +49,11 @@ const dislikeCard = (req, res) => {
     { $pull: { likes: req.user._id } },
     { new: true },
   )
+    .orFail(() => {
+      const err = new Error();
+      err.message = 'NotFound';
+      throw err;
+    })
     .then((card) => res.status(200).send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -58,7 +68,12 @@ const dislikeCard = (req, res) => {
 
 const deleteCard = (req, res) => {
   const { cardId } = req.params;
-  return Cards.findByIdAndRemove(cardId)
+  Cards.findByIdAndRemove(cardId)
+    .orFail(() => {
+      const err = new Error();
+      err.message = 'NotFound';
+      throw err;
+    })
     .then((card) => res.status(200).send(card))
     .catch((err) => {
       if (err.name === 'CastError') {

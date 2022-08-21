@@ -10,7 +10,12 @@ const getUsers = (req, res) => {
 
 const getUser = (req, res) => {
   const { userId } = req.params;
-  return User.findById(userId)
+  User.findById(userId)
+    .orFail(() => {
+      const err = new Error();
+      err.message = 'NotFound';
+      throw err;
+    })
     .then((user) => res.status(200).send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -25,7 +30,7 @@ const getUser = (req, res) => {
 
 const createUser = (req, res) => {
   const { name, about, avatar } = req.body;
-  return User.create({ name, about, avatar })
+  User.create({ name, about, avatar })
     .then((user) => res.status(201).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -40,7 +45,7 @@ const createUser = (req, res) => {
 
 const updateUserInfo = (req, res) => {
   const { name, about } = req.body;
-  return User.findByIdAndUpdate(
+  User.findByIdAndUpdate(
     req.user._id,
     { name, about },
     {
@@ -48,6 +53,11 @@ const updateUserInfo = (req, res) => {
       runValidators: true,
     },
   )
+    .orFail(() => {
+      const err = new Error();
+      err.message = 'NotFound';
+      throw err;
+    })
     .then((user) => res.status(200).send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -62,7 +72,7 @@ const updateUserInfo = (req, res) => {
 
 const updateUserAvatar = (req, res) => {
   const { avatar } = req.body;
-  return User.findByIdAndUpdate(
+  User.findByIdAndUpdate(
     req.user._id,
     { avatar },
     {
@@ -70,6 +80,11 @@ const updateUserAvatar = (req, res) => {
       runValidators: true,
     },
   )
+    .orFail(() => {
+      const err = new Error();
+      err.message = 'NotFound';
+      throw err;
+    })
     .then((user) => res.status(200).send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
