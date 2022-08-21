@@ -13,8 +13,10 @@ const getUser = (req, res) => {
   return User.findById(userId)
     .then((user) => res.status(200).send(user))
     .catch((err) => {
-      if (err.message === 'NotFound') {
-        res.status(404).send({ message: 'Пользователь по указанному _id не найден.' });
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Передан некорректный идентификатор пользователя.' });
+      } else if (err.message === 'NotFound') {
+        res.status(404).send({ message: 'Такого пользователя не существует.' });
       } else {
         res.status(500).send({ message: 'Ошибка по умолчанию.' });
       }
@@ -24,17 +26,19 @@ const getUser = (req, res) => {
 const createUser = (req, res) => {
   const { name, about, avatar } = req.body;
   return User.create({ name, about, avatar })
-    .then((user) => res.status(200).send(user))
+    .then((user) => res.status(201).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+      } else if (err.message === 'NotFound') {
+        res.status(404).send({ message: 'Такого пользователя не существует.' });
       } else {
         res.status(500).send({ message: 'Ошибка по умолчанию.' });
       }
     });
 };
 
-const updateUserProfile = (req, res) => {
+const updateUserInfo = (req, res) => {
   const { name, about } = req.body;
   return User.findByIdAndUpdate(
     req.user._id,
@@ -46,8 +50,8 @@ const updateUserProfile = (req, res) => {
   )
     .then((user) => res.status(200).send(user))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Передан некорректный идентификатор пользователя.' });
       } else if (err.message === 'NotFound') {
         res.status(404).send({ message: 'Пользователь по указанному _id не найден.' });
       } else {
@@ -68,8 +72,8 @@ const updateUserAvatar = (req, res) => {
   )
     .then((user) => res.status(200).send(user))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Передан некорректный идентификатор пользователя.' });
       } else if (err.message === 'NotFound') {
         res.status(404).send({ message: 'Пользователь по указанному _id не найден.' });
       } else {
@@ -82,6 +86,6 @@ module.exports = {
   getUsers,
   getUser,
   createUser,
-  updateUserProfile,
+  updateUserInfo,
   updateUserAvatar,
 };

@@ -61,7 +61,9 @@ const deleteCard = (req, res) => {
   return Cards.findByIdAndRemove(cardId)
     .then((card) => res.status(200).send(card))
     .catch((err) => {
-      if (err.message === 'NotFound') {
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Переданы некорректные данные для удаления карточки.' });
+      } else if (err.message === 'NotFound') {
         res.status(404).send({ message: 'Карточка не найдена.' });
       } else {
         res.status(500).send({ message: 'Ошибка по умолчанию.' });
