@@ -60,7 +60,7 @@ const updateUserInfo = (req, res) => {
     })
     .then((user) => res.status(200).send(user))
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === 'CastError' || err.name === 'ValidationError') {
         res.status(400).send({ message: 'Передан некорректный идентификатор пользователя.' });
       } else if (err.message === 'NotFound') {
         res.status(404).send({ message: 'Пользователь по указанному _id не найден.' });
