@@ -1,61 +1,24 @@
-const Cards = require('../models/card');
+const Card = require('../models/card');
 const BadRequestError = require('../errors/BadRequestError');
 const ForbiddenError = require('../errors/ForbiddenError');
 const NotFoundError = require('../errors/NotFoundError');
-const { CREATED } = require('../utils/constants');
+const { created } = require('../utils/responseStatus');
 
 const getCards = (req, res, next) => {
-  Cards.find({})
+  Card.find({})
     .then((cards) => res.send(cards))
     .catch(next);
 };
 
 const createCard = (req, res, next) => {
-  const { name, link } = req.body;
   const owner = req.user._id;
-  Cards.create({ name, link, owner })
-    .then((card) => res.status(CREATED).send(card))
+  const { name, link } = req.body;
+
+  Card.create({ owner, name, link })
+    .then((card) => res.status(created).send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequestError('Переданы некорректные данные при создании карточки.'));
-      } else {
-        next(err);
-      }
-    });
-};
-
-const likeCard = (req, res, next) => {
-  const { id } = req.params;
-  const owner = req.user._id;
-  Cards.findByIdAndUpdate(
-    id,
-    { $addToSet: { likes: owner } },
-    { new: true },
-  )
-    .orFail(() => new NotFoundError('Карточка не найдена.'))
-    .then((card) => res.send(card))
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new BadRequestError('Передан несуществующий id карточки.'));
-      } else {
-        next(err);
-      }
-    });
-};
-
-const dislikeCard = (req, res, next) => {
-  const { id } = req.params;
-  const owner = req.user._id;
-  Cards.findByIdAndUpdate(
-    id,
-    { $pull: { likes: owner } },
-    { new: true },
-  )
-    .orFail(() => new NotFoundError('Карточка не найдена.'))
-    .then((card) => res.send(card))
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new BadRequestError('Переданы некорректные данные для постановки лайка.'));
+        next(new BadRequestError('Ошибка валидации.'));
       } else {
         next(err);
       }
@@ -63,25 +26,59 @@ const dislikeCard = (req, res, next) => {
 };
 
 const deleteCard = (req, res, next) => {
-  const { id } = req.params;
   const userId = req.user._id;
-  Cards.findById(id)
-    .orFail(() => new NotFoundError('Карточка не найдена.'))
+  const { id } = req.params;
+
+  Card.findById(id)
+    .orFail(() => new NotFoundError('Карточка не существует.'))
     .then((card) => {
       if (!card.owner.equals(userId)) {
-        return next(new ForbiddenError('Удаление карточки запрещено.'));
+        return next(new ForbiddenError('Доступ запрещен.'));
       }
-      return Cards.deleteOne(card)
+
+      return Card.deleteOne(card)
         .then(() => res.send(card))
         .catch(next);
     })
     .catch(next);
 };
 
+const setLikeCard = (req, res, next) => {
+  const owner = req.user._id;
+  const { id } = req.params;
+
+  Card.findByIdAndUpdate(id, { $addToSet: { likes: owner } }, { new: true })
+    .orFail(() => new NotFoundError('Карточка не существует.'))
+    .then((card) => res.send(card))
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new BadRequestError('Невалидный идентификатор карточки.'));
+      } else {
+        next(err);
+      }
+    });
+};
+
+const deleteLikeCard = (req, res, next) => {
+  const owner = req.user._id;
+  const { id } = req.params;
+
+  Card.findByIdAndUpdate(id, { $pull: { likes: owner } }, { new: true })
+    .orFail(() => new NotFoundError('Карточка не существует.'))
+    .then((card) => res.send(card))
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new BadRequestError('Невалидный идентификатор карточки.'));
+      } else {
+        next(err);
+      }
+    });
+};
+
 module.exports = {
   getCards,
   createCard,
-  likeCard,
-  dislikeCard,
   deleteCard,
+  setLikeCard,
+  deleteLikeCard,
 };
