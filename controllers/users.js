@@ -1,14 +1,10 @@
 const bcrypt = require('bcrypt');
 const User = require('../models/user');
-const { generateToken } = require('../utils/jwt');
 const BadRequestError = require('../errors/BadRequestError');
 const AuthError = require('../errors/AuthError');
 const NotFoundError = require('../errors/NotFoundError');
-const ConflictError = require('../errors/ConflictingError');
 const { CREATED } = require('../utils/constants');
-
-const MONGO_DUPLICATE_ERROR_CODE = 11000;
-const SALT_ROUNDS = 10;
+const { generateToken } = require('../utils/jwt');
 
 const getUsers = (req, res, next) => {
   User.find({})
@@ -18,13 +14,12 @@ const getUsers = (req, res, next) => {
 
 const getUser = (req, res, next) => {
   const { id } = req.params;
-
   User.findById(id)
-    .orFail(() => new NotFoundError('Пользователь не существует.'))
+    .orFail(() => new NotFoundError('Такого пользователя не существует.'))
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequestError('Невалидный идентификатор пользователя.'));
+        next(new BadRequestError('Передан некорректный идентификатор пользователя.'));
       } else {
         next(err);
       }
@@ -33,30 +28,19 @@ const getUser = (req, res, next) => {
 
 const getCurrentUser = (req, res, next) => {
   const id = req.user._id;
-
   User.findById(id)
-    .orFail(() => new NotFoundError('Пользователь не существует.'))
+    .orFail(() => new NotFoundError('Такого пользователя не существует.'))
     .then((user) => res.send(user))
     .catch(next);
 };
 
 const createUser = (req, res, next) => {
   const {
-    name,
-    about,
-    avatar,
-    email,
-    password,
+    name, about, avatar, email, password,
   } = req.body;
-
-  bcrypt
-    .hash(password, SALT_ROUNDS)
+  bcrypt.hash(password, 10)
     .then((hash) => User.create({
-      name,
-      about,
-      avatar,
-      email,
-      password: hash,
+      name, about, avatar, email, password: hash,
     }))
     .then((user) => res.status(CREATED).send({
       _id: user._id,
@@ -67,9 +51,7 @@ const createUser = (req, res, next) => {
     }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequestError('Невалидные данные пользователя.'));
-      } else if (err.code === MONGO_DUPLICATE_ERROR_CODE) {
-        next(new ConflictError('Email занят.'));
+        next(new BadRequestError('Переданы некорректные данные при создании пользователя.'));
       } else {
         next(err);
       }
@@ -79,13 +61,19 @@ const createUser = (req, res, next) => {
 const updateUserInfo = (req, res, next) => {
   const id = req.user._id;
   const { name, about } = req.body;
-
-  User.findByIdAndUpdate(id, { name, about }, { new: true, runValidators: true })
-    .orFail(() => new NotFoundError('Пользователь не существует.'))
+  User.findByIdAndUpdate(
+    id,
+    { name, about },
+    {
+      new: true,
+      runValidators: true,
+    },
+  )
+    .orFail(() => new NotFoundError('Такого пользователя не существует.'))
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequestError('Невалидный идентификатор пользователя.'));
+        next(new BadRequestError('Передан некорректный идентификатор пользователя.'));
       } else {
         next(err);
       }
@@ -95,13 +83,19 @@ const updateUserInfo = (req, res, next) => {
 const updateUserAvatar = (req, res, next) => {
   const id = req.user._id;
   const { avatar } = req.body;
-
-  User.findByIdAndUpdate(id, { avatar }, { new: true, runValidators: true })
-    .orFail(() => new NotFoundError('Пользователь не существует.'))
+  User.findByIdAndUpdate(
+    id,
+    { avatar },
+    {
+      new: true,
+      runValidators: true,
+    },
+  )
+    .orFail(() => new NotFoundError('Такого пользователя не существует.'))
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequestError('Невалидный идентификатор пользователя.'));
+        next(new BadRequestError('Переданы некорректные данные.'));
       } else {
         next(err);
       }
@@ -110,13 +104,11 @@ const updateUserAvatar = (req, res, next) => {
 
 const login = (req, res, next) => {
   const { email, password } = req.body;
-
   User.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
         throw new AuthError('Пользователь не существует.');
       }
-
       return Promise.all([
         user,
         bcrypt.compare(password, user.password),
@@ -126,7 +118,6 @@ const login = (req, res, next) => {
       if (!isPasswordCorrect) {
         throw new AuthError('Не правильный email или пароль.');
       }
-
       return generateToken({ _id: user._id }, '7d');
     })
     .then((token) => {
