@@ -4,8 +4,8 @@ const { generateToken } = require('../utils/jwt');
 const BadRequestError = require('../errors/BadRequestError');
 const UnauthorizedError = require('../errors/UnauthorizedError');
 const NotFoundError = require('../errors/NotFoundError');
-const ConflictError = require('../errors/ConflictError');
-const { created } = require('../utils/responseStatus');
+const ConflictError = require('../errors/ConflictingError');
+const { created } = require('../utils/constants');
 
 const MONGO_DUPLICATE_ERROR_CODE = 11000;
 const SALT_ROUNDS = 10;

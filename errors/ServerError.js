@@ -1,10 +1,10 @@
-const { unauthorized } = require('../utils/responseStatus');
+const { SERVER_ERR } = require('../utils/responseStatus');
 
-class UnauthorizedError extends Error {
+class ServerError extends Error {
   constructor(message) {
     super(message);
-    this.statusCode = unauthorized;
+    this.statusCode = SERVER_ERR;
   }
 }
 
-module.exports = UnauthorizedError;
+module.exports = ServerError;

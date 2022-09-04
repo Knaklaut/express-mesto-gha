@@ -1,9 +1,9 @@
-const { badRequest } = require('../utils/responseStatus');
+const { BAD_REQUEST } = require('../utils/constants');
 
 class BadRequestError extends Error {
   constructor(message) {
     super(message);
-    this.statusCode = badRequest;
+    this.statusCode = BAD_REQUEST;
   }
 }
 
