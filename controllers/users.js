@@ -2,10 +2,10 @@ const bcrypt = require('bcrypt');
 const User = require('../models/user');
 const { generateToken } = require('../utils/jwt');
 const BadRequestError = require('../errors/BadRequestError');
-const UnauthorizedError = require('../errors/UnauthorizedError');
+const AuthError = require('../errors/AuthError');
 const NotFoundError = require('../errors/NotFoundError');
 const ConflictError = require('../errors/ConflictingError');
-const { created } = require('../utils/constants');
+const { CREATED } = require('../utils/constants');
 
 const MONGO_DUPLICATE_ERROR_CODE = 11000;
 const SALT_ROUNDS = 10;
@@ -58,7 +58,7 @@ const createUser = (req, res, next) => {
       email,
       password: hash,
     }))
-    .then((user) => res.status(created).send({
+    .then((user) => res.status(CREATED).send({
       _id: user._id,
       name: user.name,
       about: user.about,
@@ -114,7 +114,7 @@ const login = (req, res, next) => {
   User.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        throw new UnauthorizedError('Пользователь не существует.');
+        throw new AuthError('Пользователь не существует.');
       }
 
       return Promise.all([
@@ -124,7 +124,7 @@ const login = (req, res, next) => {
     })
     .then(([user, isPasswordCorrect]) => {
       if (!isPasswordCorrect) {
-        throw new UnauthorizedError('Не правильный email или пароль.');
+        throw new AuthError('Не правильный email или пароль.');
       }
 
       return generateToken({ _id: user._id }, '7d');
