@@ -1,4 +1,4 @@
-const { SERVER_ERR } = require('../utils/responseStatus');
+const { SERVER_ERR } = require('../utils/constants');
 
 class ServerError extends Error {
   constructor(message) {
