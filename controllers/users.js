@@ -3,6 +3,7 @@ const User = require('../models/user');
 const BadRequestError = require('../errors/BadRequestError');
 const AuthError = require('../errors/AuthError');
 const NotFoundError = require('../errors/NotFoundError');
+const ConflictingError = require('../errors/ConflictingError');
 const { CREATED } = require('../utils/constants');
 const { generateToken } = require('../utils/jwt');
 
@@ -52,6 +53,8 @@ const createUser = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные при создании пользователя.'));
+      } else if (err.code === 11000) {
+        next(new ConflictingError('Пользователь с таким email существуетю'));
       } else {
         next(err);
       }
