@@ -5,8 +5,7 @@ const { errors } = require('celebrate');
 
 const { validationAuth, validationUser } = require('./middlewares/validityCheck');
 const auth = require('./middlewares/auth');
-const errProcessor = require('./middlewares/errProcessor');
-const notFoundPage = require('./middlewares/notFoundPage');
+const { generalProcessor, notFoundProcessor } = require('./middlewares/errProcessor');
 const createUser = require('./routes/newUserRouter');
 const login = require('./routes/login');
 const usersRouter = require('./routes/users');
@@ -24,8 +23,8 @@ app.use('/signup', validationUser, createUser);
 app.use(auth);
 app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
-app.use(notFoundPage);
+app.use(notFoundProcessor);
 app.use(errors());
-app.use(errProcessor);
+app.use(generalProcessor);
 
 app.listen(PORT);
