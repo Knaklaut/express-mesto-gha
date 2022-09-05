@@ -3,7 +3,7 @@ const {
   validationId,
   validationUserInfo,
   validationAvatar,
-} = require('../middlewares/validations');
+} = require('../middlewares/validityCheck');
 const {
   getUser,
   getUsers,
