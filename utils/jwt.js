@@ -1,9 +1,10 @@
 const jwt = require('jsonwebtoken');
 
-const KEY = 'some-secret-key';
+const SECRET_KEY = 'WUBBA LUBBA DUB DUB';
 
-const generateToken = (payload, term) => jwt.sign(payload, KEY, { expiresIn: term });
-const checkToken = (token) => jwt.verify(token, KEY);
+const generateToken = (payload, lifetime) => jwt.sign(payload, SECRET_KEY, { expiresIn: lifetime });
+
+const checkToken = (token) => jwt.verify(token, SECRET_KEY);
 
 module.exports = {
   generateToken,
