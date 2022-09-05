@@ -1,61 +1,61 @@
-const { Joi, celebrate } = require('celebrate');
+const { celebrate, Joi } = require('celebrate');
 const { ObjectId } = require('mongoose').Types;
 
-const urlRegExp = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)/;
+const regExp = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)/;
 
-const validateAuthorization = celebrate({
+const validationAuth = celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
     password: Joi.string().required(),
   }),
 });
 
-const validateId = celebrate({
+const validationId = celebrate({
   params: Joi.object().keys({
     id: Joi.string().required().custom((value, helpers) => {
       if (ObjectId.isValid(value)) {
         return value;
       }
-      return helpers.message('Невалидный id');
+      return helpers.message('Некорректный id');
     }),
   }),
 });
 
-const validateUser = celebrate({
+const validationUser = celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
+    avatar: Joi.string().pattern(regExp),
     password: Joi.string().required(),
     email: Joi.string().required().email(),
-    avatar: Joi.string().pattern(urlRegExp),
   }),
 });
 
-const validateAvatar = celebrate({
-  body: {
-    avatar: Joi.string().required().pattern(urlRegExp),
-  },
-});
-
-const validateUserInfo = celebrate({
+const validationUserInfo = celebrate({
   body: {
     name: Joi.string().required().min(2).max(30),
     about: Joi.string().required().min(2).max(30),
   },
 });
 
-const validateCard = celebrate({
+const validationAvatar = celebrate({
+  body: {
+    avatar: Joi.string().required().pattern(regExp),
+  },
+});
+
+const validationCard = celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
-    link: Joi.string().required().pattern(urlRegExp),
+    link: Joi.string().required().pattern(regExp),
   }),
 });
 
 module.exports = {
-  validateAuthorization,
-  validateId,
-  validateUser,
-  validateAvatar,
-  validateUserInfo,
-  validateCard,
+  validationAuth,
+  validationId,
+  validationUser,
+  validationUserInfo,
+  validationAvatar,
+  validationCard,
 };
