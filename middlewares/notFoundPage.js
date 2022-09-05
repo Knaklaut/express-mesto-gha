@@ -1,7 +1,5 @@
 const NotFoundError = require('../errors/NotFoundError');
 
-const notFoundPage = (req, res, next) => {
-  next(new NotFoundError('Маршрут не найден'));
+module.exports = (req, res, next) => {
+  next(new NotFoundError('Запрашиваемая страница не найдена.'));
 };
-
-module.exports = notFoundPage;
