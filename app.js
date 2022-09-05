@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const { errors } = require('celebrate');
 
-const authorization = require('./middlewares/authorization');
+const authorization = require('./middlewares/auth');
 const notFoundPage = require('./middlewares/notFoundPage');
 const errorHandler = require('./middlewares/errorHandler');
 const { validateAuthorization, validateUser } = require('./middlewares/validations');
