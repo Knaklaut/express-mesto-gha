@@ -12,10 +12,10 @@ const {
   updateUserAvatar,
 } = require('../controllers/users');
 
-router.patch('/me/avatar', validationAvatar, updateUserAvatar);
-router.get('/me', getCurrentUser);
-router.patch('/me', validationUserInfo, updateUserInfo);
 router.get('/:id', validationId, getUser);
 router.get('/', getUsers);
+router.get('/me', getCurrentUser);
+router.patch('/me', validationUserInfo, updateUserInfo);
+router.patch('/me/avatar', validationAvatar, updateUserAvatar);
 
 module.exports = router;
