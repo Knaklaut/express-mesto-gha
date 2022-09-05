@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const { errors } = require('celebrate');
 
-const authorization = require('./middlewares/auth');
+const auth = require('./middlewares/auth');
 const notFoundPage = require('./middlewares/notFoundPage');
 const errorHandler = require('./middlewares/errorHandler');
 const { validateAuthorization, validateUser } = require('./middlewares/validations');
@@ -23,7 +23,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/signin', validateAuthorization, login);
 app.use('/signup', validateUser, createUser);
 
-app.use(authorization);
+app.use(auth);
 app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
 app.use(notFoundPage);
