@@ -1,5 +1,5 @@
-const { checkToken } = require('../utils/jwt');
 const AuthError = require('../errors/AuthError');
+const { checkToken } = require('../utils/jwt');
 
 const authorization = (req, res, next) => {
   const auth = req.headers.authorization;
