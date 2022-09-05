@@ -19,14 +19,12 @@ mongoose.connect('mongodb://localhost:27017/mestodb');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
-app.use(auth);
-app.use(notFoundPage);
 app.use('/signin', validationAuth, login);
 app.use('/signup', validationUser, createUser);
+app.use(auth);
 app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
-
+app.use(notFoundPage);
 app.use(errors());
 app.use(errProcessor);
 
