@@ -7,8 +7,8 @@ const authorization = require('./middlewares/auth');
 const notFoundPage = require('./middlewares/notFoundPage');
 const errProcessor = require('./middlewares/errProcessor');
 const { validationAuth, validationUser } = require('./middlewares/validityCheck');
-const { createUser } = require('./routes/addRouter');
-const { login } = require('./routes/addRouter');
+const createUser = require('./routes/newUserRouter');
+const login = require('./routes/login');
 const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
 
