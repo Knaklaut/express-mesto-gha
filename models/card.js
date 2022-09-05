@@ -3,23 +3,23 @@ const validator = require('validator');
 
 const cardSchema = new mongoose.Schema({
   name: {
-    required: true,
     type: String,
     minLength: 2,
     maxLength: 30,
+    required: true,
   },
   link: {
-    required: true,
     type: String,
     validate: {
       validator: (link) => validator.isURL(link),
-      message: 'Невалидная ссылка',
+      message: 'Некорректная ссылка',
     },
+    required: true,
   },
   owner: {
-    required: true,
     type: mongoose.Schema.Types.ObjectId,
     ref: 'user',
+    required: true,
   },
   likes: {
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'user' }],
