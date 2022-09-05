@@ -1,7 +1,7 @@
 const { Joi, celebrate } = require('celebrate');
 const { ObjectId } = require('mongoose').Types;
 
-const regExp = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)/;
+const regExp = require('../utils/regExp');
 
 const validationAuth = celebrate({
   body: Joi.object().keys({
