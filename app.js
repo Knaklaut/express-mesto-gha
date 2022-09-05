@@ -5,7 +5,7 @@ const { errors } = require('celebrate');
 
 const authorization = require('./middlewares/auth');
 const notFoundPage = require('./middlewares/notFoundPage');
-const errorHandler = require('./middlewares/errorHandler');
+const errProcessor = require('./middlewares/errProcessor');
 const { validateAuthorization, validateUser } = require('./middlewares/validations');
 const createUser = require('./routes/createUser');
 const login = require('./routes/login');
@@ -29,6 +29,6 @@ app.use('/cards', cardsRouter);
 app.use(notFoundPage);
 
 app.use(errors());
-app.use(errorHandler);
+app.use(errProcessor);
 
 app.listen(PORT);
