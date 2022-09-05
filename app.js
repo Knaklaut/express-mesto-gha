@@ -15,6 +15,8 @@ const cardsRouter = require('./routes/cards');
 const { PORT = 3000 } = process.env;
 const app = express();
 
+mongoose.connect('mongodb://localhost:27017/mestodb');
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -24,8 +26,6 @@ app.use('/signin', validationAuth, login);
 app.use('/signup', validationUser, createUser);
 app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
-
-mongoose.connect('mongodb://localhost:27017/mestodb');
 
 app.use(errors());
 app.use(errProcessor);
