@@ -5,7 +5,7 @@ const AuthError = require('../errors/AuthError');
 const NotFoundError = require('../errors/NotFoundError');
 const ConflictingError = require('../errors/ConflictingError');
 const { CREATED } = require('../utils/constants');
-const createToken = require('../utils/jwt');
+const tokenGen = require('../utils/token');
 
 const getUsers = (req, res, next) => {
   User.find({})
@@ -121,7 +121,7 @@ const login = (req, res, next) => {
       if (!isPasswordCorrect) {
         throw new AuthError('Не правильный email или пароль.');
       }
-      return createToken({ _id: user._id }, '7d');
+      return tokenGen({ _id: user._id }, '7d');
     })
     .then((token) => {
       res.send({ token });
