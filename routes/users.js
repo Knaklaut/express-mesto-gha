@@ -5,17 +5,17 @@ const {
   validationAvatar,
 } = require('../middlewares/validityCheck');
 const {
-  getUser,
   getUsers,
+  getUser,
   getCurrentUser,
   updateUserInfo,
   updateUserAvatar,
 } = require('../controllers/users');
 
-router.get('/:id', validationId, getUser);
-router.get('/', getUsers);
+router.patch('/me/avatar', validationAvatar, updateUserAvatar);
 router.get('/me', getCurrentUser);
 router.patch('/me', validationUserInfo, updateUserInfo);
-router.patch('/me/avatar', validationAvatar, updateUserAvatar);
+router.get('/:id', validationId, getUser);
+router.get('/', getUsers);
 
 module.exports = router;
