@@ -1,11 +1,11 @@
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const BadRequestError = require('../errors/BadRequestError');
 const AuthError = require('../errors/AuthError');
 const NotFoundError = require('../errors/NotFoundError');
 const ConflictingError = require('../errors/ConflictingError');
 const { CREATED } = require('../utils/constants');
-const tokenGen = require('../utils/token');
 
 const getUsers = (req, res, next) => {
   User.find({})
@@ -104,6 +104,8 @@ const updateUserAvatar = (req, res, next) => {
       }
     });
 };
+
+const tokenGen = (payload, term) => jwt.sign(payload, 'some-secret-key', { expiresIn: term });
 
 const login = (req, res, next) => {
   const { email, password } = req.body;
